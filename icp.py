@@ -4,39 +4,20 @@
 #@Author: csc
 #@File  : icp.py
 
-import open3d as o3d
-import numpy as np
+from icp_support import *
 
-def pointMatching(pointlist1,pointlist2):
-    matchingList = []
-    for i in range(pointlist1):
-        dist = None
-        match = None
-        for j in range(pointlist2):
-            temp = np.linalg.norm(pointlist1[i]-pointlist2[j])
-            if temp == 0:
-                match = [i,j]
-                break
-            if dist is None:
-                dist = temp
-                match = [i,j]
-                continue
-            if dist > temp:
-                dist = temp
-                match = [i,j]
-        matchingList.append(match)
-    return matchingList
-
-
-
-print("Test IO for mesh ...")
-mesh0 = o3d.io.read_triangle_mesh("./OralScans/0.ply")
-mesh1 = o3d.io.read_triangle_mesh("./OralScans/1.ply")
-point0 = np.array(mesh0.vertices)
+mesh1 = o3d.io.read_triangle_mesh("./OralScans/0.ply")
+mesh2 = o3d.io.read_triangle_mesh("./OralScans/1.ply")
 point1 = np.array(mesh1.vertices)
-matchingList = pointMatching(point0,point1)
+point2 = np.array(mesh2.vertices)
+print("cal matching")
+p1,p2 = pointMatching(point1,point2)
+print("cal transformation")
+Trans = calTransformation(p1,p2)
+print("Transform...")
+mesh1_ = mesh1.tranform(Trans)
 
-mesh3 = o3d.geometry.TriangleMesh(o3d.utility.DoubleVector(point1))
-mesh3 = mesh0 + mesh1
-o3d.visualization.draw_geometries([mesh3])
-#o3d.io.write_triangle_mesh("copy_of_1.ply",mesh)
+mesh3 = mesh1 + mesh2
+o3d.visualization.draw_geometries([mesh3],window_name="old")
+mesh3 = mesh1_ + mesh2
+o3d.visualization.draw_geometries([mesh3],window_name="new")
