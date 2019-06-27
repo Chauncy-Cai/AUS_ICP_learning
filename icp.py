@@ -6,18 +6,19 @@
 
 from icp_support import *
 
-mesh1 = o3d.io.read_triangle_mesh("./OralScans/0.ply")
-mesh2 = o3d.io.read_triangle_mesh("./OralScans/1.ply")
-point1 = np.array(mesh1.vertices)
-point2 = np.array(mesh2.vertices)
-print("cal matching")
-p1,p2 = pointMatching(point1,point2)
-print("cal transformation")
-Trans = calTransformation(p1,p2)
-print("Transform...")
-mesh1_ = mesh1.tranform(Trans)
+pcd1 = o3d.io.read_point_cloud("./OralScans/0.ply")
+pcd2 = o3d.io.read_point_cloud("./OralScans/1.ply")
+o3d.visualization.draw_geometries([pcd1+pcd2],window_name="old",width=300,height=300)
+showlist = [1,20, 50, 90]
+epo = 91
+for i in range(epo):
+    point1 = np.array(pcd1.points)
+    point2 = np.array(pcd2.points)
+    p1,p2 = pointMatching(point1,point2)
+    print("["+str(i)+"/"+str(epo)+"]loss:" + str(icploss(p1,p2)))
+    Trans = calTransformation(p1,p2).T
+    pcd1.transform(Trans)
+    if(i in showlist):
+        o3d.visualization.draw_geometries([pcd1+pcd2],window_name="new",width=300,height=300)
 
-mesh3 = mesh1 + mesh2
-o3d.visualization.draw_geometries([mesh3],window_name="old")
-mesh3 = mesh1_ + mesh2
-o3d.visualization.draw_geometries([mesh3],window_name="new")
+

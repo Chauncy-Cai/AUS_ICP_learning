@@ -7,7 +7,7 @@
 import numpy as np
 
 def transform(alpha,beta,gamma,x,y,z):
-    motion = np.array([x,y,z])
+    mov = np.array([[x, y, z]]).T
     A = [[1,0,0],
         [0,np.cos(alpha), -np.sin(alpha)],
         [0,np.sin(alpha), np.cos(alpha)]]
@@ -19,6 +19,7 @@ def transform(alpha,beta,gamma,x,y,z):
          [0, 0, 1]]
     W = np.dot(A,B)
     W = np.dot(W,C)
-    Tran = np.append(W, motion, axis=1)
-    Tran = np.append(Tran, [0, 0, 0, 1])
+    #rot = W
+    Tran = np.append(W, mov, axis=1)
+    Tran = np.append(Tran, np.array([[0, 0, 0, 1]]), axis=0)
     return Tran
