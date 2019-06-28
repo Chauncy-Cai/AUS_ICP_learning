@@ -25,7 +25,7 @@ for i in range(32):
     p2 = np.array(A2.points)
     p1, p2 = pointMatching(p1, p2)
     print("[" + str(i) + "/91] loss:" + str(icploss(p1, p2)))
-    Tran0 = calTransformation(p1, p2).T
+    Tran0 = calTransformation(p1, p2)
     A1.transform(Tran0)
     if (i in showlist)|(mark==1):
         o3d.visualization.draw_geometries([A1 + A2], window_name="epo "+str(i),width=300,height=300)

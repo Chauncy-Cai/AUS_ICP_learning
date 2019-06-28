@@ -47,8 +47,7 @@ def calTransformation(p1,p2):
     d2 = calDense(p2)
     p1 = calverse(d1, p1)
     p2 = calverse(d2, p2)
-    #===========
-    W = calW(p1, p2).T
+    W = calW(p1, p2)
     u, _, vt = np.linalg.svd(W)
     R = np.dot(u, vt)
     d1 = np.array([d1]).T

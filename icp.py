@@ -16,7 +16,7 @@ for i in range(epo):
     point2 = np.array(pcd2.points)
     p1,p2 = pointMatching(point1,point2)
     print("["+str(i)+"/"+str(epo)+"]loss:" + str(icploss(p1,p2)))
-    Trans = calTransformation(p1,p2).T
+    Trans = calTransformation(p1,p2)
     pcd1.transform(Trans)
     if(i in showlist):
         o3d.visualization.draw_geometries([pcd1+pcd2],window_name="new",width=300,height=300)
