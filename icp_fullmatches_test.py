@@ -5,7 +5,6 @@
 #@File  : icp_fullmatches_test.py
 
 from icp_support import *
-from TransformGeneration import *
 import numpy as np
 import open3d as o3d
 

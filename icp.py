@@ -5,10 +5,11 @@
 #@File  : icp.py
 
 from icp_support import *
+import open3d as o3d
 
 pcd1 = o3d.io.read_point_cloud("./OralScans/0.ply")
 pcd2 = o3d.io.read_point_cloud("./OralScans/1.ply")
-o3d.visualization.draw_geometries([pcd1+pcd2],window_name="old",width=300,height=300)
+#o3d.visualization.draw_geometries([pcd1+pcd2],window_name="old",width=300,height=300)
 showlist = [1,20, 50, 90]
 epo = 91
 for i in range(epo):
