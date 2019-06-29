@@ -90,12 +90,16 @@ def pack(R, t):
     T[:3, 3] = t
     return T
 
-def cal_transformation(p1, p2):
+def cal_transformation(p1, p2,weight="none"):
     # 1=>2 p1->q2
     d1 = np.mean(p1, axis=0)
     d2 = np.mean(p2, axis=0)
     p1 = p1 - d1
     p2 = p2 - d2
+    if type(weight)!=str:
+        #print(weight,p2)
+        p2 = weight*p2 #引入权重矩阵
+        #print(p2)
     W = p2.T.dot(p1)
     u, _, vt = np.linalg.svd(W)
     R = np.dot(u, vt)
@@ -104,7 +108,9 @@ def cal_transformation(p1, p2):
     t = d2 - np.dot(R, d1)
     return pack(R, t)
 
-def icploss(p1, p2):
+def icploss(p1, p2, weight="none"):
+    if type(weight)!=str:
+        return np.linalg.norm(weight * (p1-p2))/len(p1)
     return np.linalg.norm(p1 - p2) / len(p1)
 
 
@@ -130,12 +136,16 @@ def generate_points(d=100, count=5000, message=0, demo=0):
     point2plane
     p1: point cloud 1
     p2: point cloud 2
-    normofpc2: normal of point cloud 2
+    normofp2: normal of point cloud 2
 """
-def cal_transformation_p2pl(p1, p2, normofp2):  # p1->p2
+def cal_transformation_p2pl(p1, p2, normofp2,weight = "none"):  # p1->p2
     cross = np.cross(p1, normofp2)
     Para = np.append(normofp2, cross, axis=1)  # n*6
-    b = np.sum(((p1 - p2) * normofp2), axis=1)
+    b = np.sum(((p1 - p2) * normofp2), axis=1) # n*1
+    #print(b.shape)
+    if type(weight)!=str:
+        b = weight * b
+        Para = weight * Para
     b = np.dot(np.array([b]), Para).T
     A = np.dot(Para.T, Para)
     delta_translation_rotation = np.linalg.solve(A, -b).T[0]
