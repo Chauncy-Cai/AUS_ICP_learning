@@ -12,19 +12,24 @@ A1 = o3d.geometry.PointCloud()
 points = generate_points(message=1,d=1,count=500)
 A1.points = o3d.utility.Vector3dVector(points)
 A2 = o3d.geometry.PointCloud()
-points = generate_points(message=1,d=1)
+points = generate_points(message=1,d=1,count=1000)
 A2.points = o3d.utility.Vector3dVector(points)
 Tran = transform(0.2, 0.3, 0.4, 1, 2, 3).T
 A1.transform(Tran)
+o3d.estimate_normals(A2)
+A2.normalize_normals()
+p2norm = np.array(A2.normals)
 o3d.visualization.draw_geometries([A1 + A2], window_name="epo ",width=300,height=300)
 showlist = [1,11,21,31]
 for i in range(32):
     mark = 0
     p1 = np.array(A1.points)
     p2 = np.array(A2.points)
-    p1, p2 = pointMatching(p1, p2)
+    p1, p2, indice = pointMatching(p1, p2)
     print("[" + str(i) + "/91] loss:" + str(icploss(p1, p2)))
-    Tran0 = calTransformation(p1, p2)
+    #Tran0 = calTransformation(p1, p2)              #p2p
+    p2norm_use = p2norm [indice]                    #p2pl
+    Tran0 = calTransformation_p2pl(p1, p2,p2norm_use)#p2pl
     A1.transform(Tran0)
     if (i in showlist)|(mark==1):
         o3d.visualization.draw_geometries([A1 + A2], window_name="epo "+str(i),width=300,height=300)
