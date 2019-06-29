@@ -28,9 +28,10 @@ def check(P1, P2):
 
 
 def pointMatching(pointlist1, pointlist2):
+    import time
     pointlist1 = np.array(pointlist1)
     pointlist2 = np.array(pointlist2)
-    nbrs = NearestNeighbors(n_neighbors=1).fit(pointlist2)
+    nbrs = NearestNeighbors(n_neighbors=1, n_jobs=10).fit(pointlist2)
     _, indices = nbrs.kneighbors(pointlist1)
     p1 = np.array([pointlist1[i] for i in range(len(pointlist1))])
     p2 = np.array([pointlist2[indices[i][0]] for i in range(len(pointlist1))])
@@ -38,55 +39,70 @@ def pointMatching(pointlist1, pointlist2):
     return p1, p2, indices
 
 
-def transform(alpha, beta, gamma, x, y, z):
-    mov = np.array([[x, y, z]]).T
-    A = [[1, 0, 0],
-         [0, np.cos(alpha), -np.sin(alpha)],
-         [0, np.sin(alpha), np.cos(alpha)]]
-    B = [[np.cos(beta), 0, np.sin(beta)],
-         [0, 1, 0],
-         [-np.sin(beta), 0, np.cos(beta)]]
-    C = [[np.cos(gamma), -np.sin(gamma), 0],
-         [np.sin(gamma), np.cos(gamma), 0],
-         [0, 0, 1]]
-    W = np.dot(A, B)
-    W = np.dot(W, C)
-    # rot = W
-    Tran = np.append(W, mov, axis=1)
-    Tran = np.append(Tran, np.array([[0, 0, 0, 1]]), axis=0)
-    return Tran
+#def transform(alpha, beta, gamma, x, y, z):
+#    mov = np.array([[x, y, z]]).T
+#    A = [[1, 0, 0],
+#         [0, np.cos(alpha), -np.sin(alpha)],
+#         [0, np.sin(alpha), np.cos(alpha)]]
+#    B = [[np.cos(beta), 0, np.sin(beta)],
+#         [0, 1, 0],
+#         [-np.sin(beta), 0, np.cos(beta)]]
+#    C = [[np.cos(gamma), -np.sin(gamma), 0],
+#         [np.sin(gamma), np.cos(gamma), 0],
+#         [0, 0, 1]]
+#    W = np.dot(A, B)
+#    W = np.dot(W, C)
+#    # rot = W
+#    Tran = np.append(W, mov, axis=1)
+#    Tran = np.append(Tran, np.array([[0, 0, 0, 1]]), axis=0)
+#    
+#    return Tran
 
+def cross_op(r):
+    R = np.zeros((3, 3))
+    R[0, 1] = -r[2]
+    R[0, 2] = r[1]
+    R[1, 2] = -r[0]
+    R = R - R.T
+    return R
 
-def calTransformation(p1, p2):
+def vec2pose(translation_rotation_vec):
+    t = translation_rotation_vec[:3]
+    r = translation_rotation_vec[3:]
+    theta = np.linalg.norm(r, 2)
+    k = r / theta
+    """ Roduiguez"""
+    R = np.cos(theta)*np.eye(3)+np.sin(theta)*cross_op(k)+(1-np.cos(theta))*np.outer(k, k)
+    T = np.eye(4)
+    T[:3, :3] = R
+    T[:3, 3] = t
+    return T
+
+def transform(pose_vec):
+    T = vec2pose(pose_vec)
+    R = T[:3, :3]
+    t = T[:3, 3]
+
+def pack(R, t):
+    t = np.squeeze(t)
+    T = np.eye(4)
+    T[:3, :3] = R
+    T[:3, 3] = t
+    return T
+
+def cal_transformation(p1, p2):
     # 1=>2 p1->q2
-    def calDense(points):
-        return np.sum(points, axis=0) / len(points)
-
-    def calverse(dense, points):
-        return np.array([k - dense for k in points])
-
-    def calW(p1, p2):
-        sum = np.zeros((3, 3))
-        for i in range(len(p1)):
-            sum += np.dot(p2.T, p1)  # p2,p1本来就是一维的，转智也没有什么变化
-        return sum
-
-    def Rt2mat(R, t):
-        Re = np.append(R, t, axis=1)
-        return np.append(Re, np.array([[0, 0, 0, 1]]), axis=0)
-
-    d1 = calDense(p1)
-    d2 = calDense(p2)
-    p1 = calverse(d1, p1)
-    p2 = calverse(d2, p2)
-    W = calW(p1, p2)
+    d1 = np.mean(p1, axis=0)
+    d2 = np.mean(p2, axis=0)
+    p1 = p1 - d1
+    p2 = p2 - d2
+    W = p2.T.dot(p1)
     u, _, vt = np.linalg.svd(W)
     R = np.dot(u, vt)
     d1 = np.array([d1]).T
     d2 = np.array([d2]).T
     t = d2 - np.dot(R, d1)
-    return Rt2mat(R, t)
-
+    return pack(R, t)
 
 def icploss(p1, p2):
     return np.linalg.norm(p1 - p2) / len(p1)
@@ -110,18 +126,22 @@ def generate_points(d=100, count=5000, message=0, demo=0):
     return dataset
 
 
-def calTransformation_p2pl(p1, p2, normofp2):  # p1->p2
-    cross = [np.cross(p1[i], normofp2[i]) for i in range(len(p1))]
-    cross = np.array(cross)
-    print("cross",np.shape(cross))
-    print("normofp2", np.shape(normofp2))
-    Para = np.append(cross, normofp2, axis=1)  # n*6
-    B = np.sum(((p1 - p2) * normofp2), axis=1)
-    B = np.dot(np.array([B]), Para).T
+"""
+    point2plane
+    p1: point cloud 1
+    p2: point cloud 2
+    normofpc2: normal of point cloud 2
+"""
+def cal_transformation_p2pl(p1, p2, normofp2):  # p1->p2
+    cross = np.cross(p1, normofp2)
+    Para = np.append(normofp2, cross, axis=1)  # n*6
+    b = np.sum(((p1 - p2) * normofp2), axis=1)
+    b = np.dot(np.array([b]), Para).T
     A = np.dot(Para.T, Para)
-    X = np.linalg.solve(A, -B).T[0]
-    Trans = transform(X[0], X[1], X[2], X[3], X[4], X[5])
-    return Trans
+    delta_translation_rotation = np.linalg.solve(A, -b).T[0]
+    T = vec2pose(delta_translation_rotation)
+
+    return T
 
 
 '''
