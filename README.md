@@ -1,4 +1,4 @@
-# AUS_PCI_learning
+＃AUS_ICP_learning
 this is established for my ICP-algrithom learning
 
 OralScans is the basic target dataset
