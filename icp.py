@@ -3,6 +3,10 @@
 #@Time  : 2019/6/26 6:00
 #@Author: csc
 #@File  : icp.py
+'''
+this file is aim at applicatoin of icp
+'''
+
 
 from icp_support import *
 import open3d as o3d

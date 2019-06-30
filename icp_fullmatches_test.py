@@ -3,7 +3,10 @@
 #@Time  : 2019/6/27 3:26
 #@Author: csc
 #@File  : icp_fullmatches_test.py
-
+'''
+this file is make for valification of icp
+ensure it's basic correctness
+'''
 from icp_support import *
 import numpy as np
 import open3d as o3d
