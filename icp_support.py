@@ -36,12 +36,19 @@ p1:points of point cloud1
 p2:points matching with p1 respectively
 indices: index of pointlist2, matching best of p1
 '''
-def pointMatching(pointlist1, pointlist2):
-    import time
+
+
+def pointMatching(pointlist1, pointlist2, color1=None, color2=None, hascolor=0):
     pointlist1 = np.array(pointlist1)
     pointlist2 = np.array(pointlist2)
-    nbrs = NearestNeighbors(n_neighbors=1, n_jobs=10).fit(pointlist2)
-    _, indices = nbrs.kneighbors(pointlist1)
+    if hascolor == 0:
+        nbrs = NearestNeighbors(n_neighbors=1, n_jobs=10).fit(pointlist2)
+        _, indices = nbrs.kneighbors(pointlist1)
+    else:
+        point_and_color1 = np.append(pointlist1, color1, axis=1)
+        point_and_color2 = np.append(pointlist2, color2, axis=1)
+        nbrs = NearestNeighbors(n_neighbors=1, n_jobs=10).fit(point_and_color2)
+        _, indices = nbrs.kneighbors(point_and_color1)
     p1 = np.array([pointlist1[i] for i in range(len(pointlist1))])
     p2 = np.array([pointlist2[indices[i][0]] for i in range(len(pointlist1))])
     indices = np.array(indices).T[0]
