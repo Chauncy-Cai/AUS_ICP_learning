@@ -34,7 +34,7 @@ def custom_draw_geometry_with_view_tracking(meshes):
         for i in range(30):
             p1 = np.array(A1.points)
             p2 = np.array(A2.points)
-            p1, p2, indice = pointMatching(p1, p2)
+            p1, p2, indice = point_matching(p1, p2)
             print("[" + str(i) + "/91] loss:" + str(icploss(p1, p2)))
             weight = np.linalg.norm((p1-p2),axis=1)
             weight = (1e-1/(weight+1e-1))[:,np.newaxis]

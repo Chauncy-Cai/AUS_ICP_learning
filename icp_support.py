@@ -11,6 +11,7 @@
 
 import random
 import numpy as np
+import open3d as o3d
 from math import exp
 from sklearn.neighbors import NearestNeighbors
 
@@ -38,7 +39,7 @@ indices: index of pointlist2, matching best of p1
 '''
 
 
-def pointMatching(pointlist1, pointlist2, color1=None, color2=None, hascolor=0):
+def point_matching(pointlist1, pointlist2, color1=None, color2=None, hascolor=0):
     pointlist1 = np.array(pointlist1)
     pointlist2 = np.array(pointlist2)
     if hascolor == 0:
@@ -122,11 +123,18 @@ def cal_transformation(p1, p2,weight="none"):
 '''
 calculate the loss of algorithm of icp.
 '''
-def icploss(p1, p2, weight="none"):
-    if type(weight)!=str:
-        return np.linalg.norm(weight * (p1-p2))/len(p1)
-    return np.linalg.norm(p1 - p2) / len(p1)
-
+def icploss(p1, p2, weight="none",point2plane=0,normofp2 = None):
+    if point2plane==0:
+        if type(weight)!=str:
+            return np.linalg.norm(weight * (p1-p2))/len(p1)
+        else:
+            return np.linalg.norm(p1 - p2) / len(p1)
+    else: #point 2 plane
+        L = (p1 - p2) * normofp2
+        if type(weight)!=str:
+            return (weight*L).dot(L.T)/len(p1)
+        else:
+            return L.dot(L.T)/len(p1)
 '''
 To generate test point cloud
 '''
@@ -160,6 +168,7 @@ def cal_transformation_p2pl(p1, p2, normofp2,weight = "none"):  # p1->p2
     b = np.sum(((p1 - p2) * normofp2), axis=1) # n*1
     #print(b.shape)
     if type(weight)!=str:
+        #print(b.shape,weight.shape)
         b = weight * b
         Para = weight * Para
     b = np.dot(np.array([b]), Para).T
@@ -168,3 +177,46 @@ def cal_transformation_p2pl(p1, p2, normofp2,weight = "none"):  # p1->p2
     T = vec2pose(delta_translation_rotation)
 
     return T
+
+'''
+the icp function, make it good to be called
+INPUT:
+A1,A2 two type of point cloud
+OUTPUT:
+A1,A2 When converge
+'''
+def icp(A1,A2,weight=0,norm = 0,detail=0):
+    # put A1->A2
+    loss = 1000
+    o3d.estimate_normals(A2)
+    norm0 = np.array(A2.normals)
+    Trans0 = np.eye(4)
+    i = 0
+    while(1):
+        i+=1
+        point1 = np.array(A1.points)
+        point2 = np.array(A2.points)
+        p1,p2,indice = point_matching(point1,point2)
+        norm = norm0[indice]
+        weight = np.linalg.norm((p1 - p2), axis=1)
+        avg_weight = 0.45  # np.average(weight)
+        weight = (avg_weight / (weight + avg_weight))[:, np.newaxis]
+        newloss = icploss(p1, p2, weight)
+        if ((newloss) > 1e-5)&(i<80):
+            loss = newloss
+            if (i%10==0)|(detail==1):
+                print("converging iter " + str(i) + ", now loss is "+ str(newloss))
+        else:
+            print("converged: loss is "+str(newloss))
+            break
+        Trans = cal_transformation(p1, p2, weight)
+        #Trans = cal_transformation_p2pl(p1,p2,normofp2=norm,weight=weight)
+        A1.transform(Trans)
+        Trans0 = Trans0.dot(Trans)
+    print(Trans0)
+    return A1,Trans0
+
+def rotate_elements(pcd_list,R):
+    for A in pcd_list:
+        A.transform(R)
+    return
