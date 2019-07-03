@@ -4,10 +4,6 @@
 # @Author: csc
 # @File  : icp_support.py
 
-####
-# point2plane：缺少法向量
-# irls：缺少优化过程
-####
 
 import random
 import numpy as np
