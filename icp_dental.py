@@ -33,11 +33,11 @@ def custom_draw_geometry_with_view_tracking(meshes):
         if i%10==0:
             point1 = np.array(A1.points)
             point2 = np.array(A2.points)
-            p1, p2, indice = point_matching(point1, point2, color1, color2, 1)
+            p1, p2, indice = point_matching(point1, point2) #, color1, color2, 1)
             weight = np.linalg.norm((p1 - p2), axis=1)
             avg_weight = 0.45 #np.average(weight)
             #print(avg_weight)
-            weight = (avg_weight / (weight + avg_weight))[:, np.newaxis]
+            weight = np.exp(3*(avg_weight / (weight + avg_weight))[:, np.newaxis])
             print("loss" + str(i) + ":" + str(icploss(p1, p2, weight)))
             Trans = cal_transformation(p1, p2, weight)  # point 2 point
             # p2norm_use = p2norm[indice]                         #point 2 plane
