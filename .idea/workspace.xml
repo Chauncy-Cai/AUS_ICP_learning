@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4add586d-1011-4a8a-8225-6c6427c72963" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/icp_support.py" beforeDir="false" afterPath="$PROJECT_DIR$/icp_support.py" afterDir="false" />
-    </list>
+    <list default="true" id="4add586d-1011-4a8a-8225-6c6427c72963" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +49,7 @@
           <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/icp_test_rabbit.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="257">
+                <state relative-caret-position="513">
                   <caret line="29" column="30" selection-start-line="29" selection-start-column="30" selection-end-line="29" selection-end-column="30" />
                 </state>
               </provider>
@@ -66,9 +64,6 @@
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="57">
                   <caret line="5" selection-start-line="5" selection-end-line="5" />
-                  <folding>
-                    <element signature="e#158#171#0" expanded="true" />
-                  </folding>
                 </state>
               </provider>
             </entry>
@@ -123,20 +118,7 @@
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes>
-      <pane id="Scope" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="AUS_ICP_learning" type="b2602c69:ProjectViewProjectNode" />
-              <item name="AUS_ICP_learning" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-    </panes>
+    <panes />
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -330,6 +312,7 @@
       <workItem from="1561994650946" duration="2884000" />
       <workItem from="1562086318991" duration="8951000" />
       <workItem from="1562163497817" duration="186000" />
+      <workItem from="1563207000618" duration="291000" />
     </task>
     <task id="LOCAL-00001" summary="add color&#10;but it seem have little impact to point2point">
       <created>1561997239435</created>
@@ -342,10 +325,11 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="84264000" />
+    <option name="totallyTimeSpent" value="84555000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1376" height="744" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.12765957" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -467,9 +451,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ScreenCamera_2019-07-03-03-58-26.json">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/ScreenCamera_2019-07-03-03-58-26.json" />
     <entry file="file://$PROJECT_DIR$/icp_standford_rabbit.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="627">
@@ -482,7 +464,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/icp_test_rabbit.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="257">
+        <state relative-caret-position="513">
           <caret line="29" column="30" selection-start-line="29" selection-start-column="30" selection-end-line="29" selection-end-column="30" />
         </state>
       </provider>
